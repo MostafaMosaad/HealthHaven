@@ -14,8 +14,8 @@ app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
 // 3) ROUTES
-app.use('https://healthhaven.onrender.com/api/doctors', doctorRouter);
-app.use('https://healthhaven.onrender.com/api/users', userRouter);
-app.use('https://healthhaven.onrender.com/api/', SignUP_Login);
+app.use('/api/doctors', doctorRouter);
+app.use('/api/users', userRouter);
+app.use('/api/', SignUP_Login);
 
 module.exports = app;

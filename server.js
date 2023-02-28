@@ -1,6 +1,6 @@
 const app = require('./app');
 const mongoose = require('mongoose')
-const DB = "mongodb://127.0.0.1:27017/Mearn"
+const DB = "mongodb+srv://HealthHaven:1234567890@cluster0.lfuzvsu.mongodb.net/HealthHaven?&retryWrites=true&w=majority"
 const port = 3000;
 
 mongoose.set('strictQuery', true);

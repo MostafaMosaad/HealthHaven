@@ -1,5 +1,11 @@
 const Doctors = require("../models/doctorModel");
-
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach(el => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
 exports.getAllDoctorsAdmin = async (req, res) => {
   try {
     const doctors = await Doctors.find(req.query);
@@ -109,11 +115,11 @@ exports.deleteDoctor = async (req, res) => {
 exports.updateMe = async (req, res, next) => {
 
   // 2) Filtered out unwanted fields names that are not allowed to be updated
-  const filteredBody = filterObj(req.body, "phone");
+  const filteredBody = filterObj(req.body, "phone","name","email","address");
 
   // 3) Update user document
   const updatedUser = await Doctors.findByIdAndUpdate(
-    req.user.id,
+    req.doctor.id,
     filteredBody,
     {
       new: true,

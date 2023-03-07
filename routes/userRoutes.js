@@ -13,14 +13,14 @@ router
   .get('/getMe', authController.protectU, userController.getMe);
 
 router
-  .patch('/booking/:id', authController.protectU, userController.Booking);
+  .patch('/booking', authController.protectU, userController.Booking);
 
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
 router
   .route('/:id')
-  .get(authController.protectAU, userController.getUser)
+  .get(authController.protectAD, userController.getUser)
   .patch(authController.protectAD, userController.updateUser)
   .delete(authController.protectA, userController.deleteUser);
 module.exports = router;

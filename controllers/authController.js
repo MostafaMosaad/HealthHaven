@@ -238,7 +238,7 @@ exports.protectU = async (req, res, next) => {
 
     // 3) Check if user still exists
     const currentUser = await Users.findById(decoded.id);
-    console.log(req.params.id)
+    // console.log(req.params.id)
     if(req.params.id)
     {
     if (currentUser && decoded.id !== req.params.id) {
@@ -250,7 +250,7 @@ exports.protectU = async (req, res, next) => {
       next();
     }
   }
-    else if(currentUser )
+    else if(currentUser&&!req.params.id )
     {
       req.user = currentUser;
       next();
@@ -279,11 +279,11 @@ exports.protectAD = async (req, res, next) => {
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
     const admin = await Admin.findById(decoded.id);
     const doctor = await Doctor.findById(decoded.id);
-    if (doctor && decoded.id !== req.params.id) {
-      res.status(401).json({
-        status: "You do not have permission to perform this action",
-      });
-    } else if (doctor && decoded.id === req.params.id) {
+    // if (doctor && decoded.id !== req.params.id) {
+    //   res.status(401).json({
+    //     status: "You do not have permission to perform this action",
+    //   });
+  if (doctor ) {
       req.user = doctor;
       next();
     } else if (admin) {

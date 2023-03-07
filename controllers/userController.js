@@ -64,23 +64,32 @@ exports.createUser = async (req, res) => {
 };
 exports.Booking= async (req, res) => {
   try {
-    let user = await Users.findById(req.params.id);
+    let userr = await Users.findById(req.user.id);
    
     const doctor = await Doctors.findById(req.body.doctor);
-    user.bookings.push({
+
+    userr.bookings.push({
       id:req.body.doctor,
       doctorName: doctor.name,
-      date: req.body.data
+      doctorCategory:doctor.category,
+      doctorMajor:doctor.major,
+      doctorPhone:doctor.phone,
+      doctorAddress:doctor.address,
+      doctorEmail:doctor.email,
+      date: new Date(Date.now().toLocaleString())
     });
-    await Users.findByIdAndUpdate(req.params.id,user, {
+    await Users.findByIdAndUpdate(req.user.id,userr, {
       new: true,
       runValidators: true,
     });
     const appointment = {
-      user: user.name,
-      id:req.params.id,
+      user: userr.name,
+      id:req.user.id,
+      medical:[],
+      
       date:new Date(Date.now())
     };
+    appointment.medical.push(userr.medicalHistory)
     doctor.appointments.push(appointment);
     await Doctors.findByIdAndUpdate(req.body.doctor, doctor, {
       new: true,
@@ -90,7 +99,7 @@ exports.Booking= async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: {
-        user
+        userr
       }
     });
   
@@ -153,7 +162,7 @@ exports.deleteUser = async (req, res) => {
 
 exports.updateMe = (async (req, res, next) => {
 
-  const filteredBody = filterObj(req.body, 'email','phone');
+  const filteredBody = filterObj(req.body, 'email','phone','name','DateOfBirth');
 
   // 3) Update user document
   const updatedUser = await Users.findByIdAndUpdate(req.user.id, filteredBody, {

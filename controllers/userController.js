@@ -1,6 +1,16 @@
 const Users = require("../models/userModel");
 const Doctors = require("../models/doctorModel");
 const { promisify } = require("util");
+
+const today = new Date();
+const yyyy = today.getFullYear();
+let mm = today.getMonth() + 1; // Months start at 0!
+let dd = today.getDate();
+
+if (dd < 10) dd = "0" + dd;
+if (mm < 10) mm = "0" + mm;
+
+const formattedToday = dd + "/" + mm + "/" + yyyy;
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
@@ -73,7 +83,7 @@ exports.Booking = async (req, res) => {
       doctorPhone: doctor.phone,
       doctorAddress: doctor.address,
       doctorEmail: doctor.email,
-      date: new Date(Date.now().toLocaleString()),
+      date: formattedToday,
       time: req.body.time,
     });
     await Users.findByIdAndUpdate(req.user.id, userr, {
@@ -85,7 +95,7 @@ exports.Booking = async (req, res) => {
       id: req.user.id,
       medical: [],
       time: req.body.time,
-      date: new Date(Date.now()).getMonth(),
+      date: formattedToday,
     };
     appointment.medical.push(userr.medicalHistory);
     doctor.appointments.push(appointment);
@@ -147,21 +157,35 @@ exports.CancelBook = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     let user = await Users.findById(req.params.id);
+    let doctor = await Doctors.findById(req.user.id);
+
     const MedicalHistory = {
       id: req.params.id,
       Discriptions: req.body.Discriptions,
       Labs: req.body.Labs,
       Pharmacies: req.body.Pharmacies,
+      DocName: doctor.name,
       date: new Date(Date.now()),
     };
-    console.log(MedicalHistory);
+    // console.log(MedicalHistory);
     if (req.body.hasOwnProperty("medicalHistory")) {
       user.medicalHistory.push(MedicalHistory);
+      for (let j = 0; j < doctor.appointments.length; j++) {
+        if (doctor.appointments[j].id === req.params.id) {
+          doctor.appointments[j].medical[0].push(MedicalHistory);
+          // console.log(doctor.appointments[j].medical[0])
+        }
+      }
+      await Doctors.findByIdAndUpdate(req.user.id, doctor, {
+        new: true,
+        runValidators: true,
+      });
+      await Users.findByIdAndUpdate(req.params.id, user, {
+        new: true,
+        runValidators: true,
+      });
     }
-    await Users.findByIdAndUpdate(req.params.id, user, {
-      new: true,
-      runValidators: true,
-    });
+
     res.status(200).json({
       status: "success",
       data: {
@@ -169,7 +193,6 @@ exports.updateUser = async (req, res) => {
       },
     });
   } catch (err) {
-    // console.log(err)
     res.status(400).json({
       status: "Failed Updating User",
       message: err,

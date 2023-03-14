@@ -165,7 +165,7 @@ exports.updateUser = async (req, res) => {
       Labs: req.body.Labs,
       Pharmacies: req.body.Pharmacies,
       DocName: doctor.name,
-      date: new Date(Date.now()),
+      date: formattedToday,
     };
     // console.log(MedicalHistory);
     if (req.body.hasOwnProperty("medicalHistory")) {

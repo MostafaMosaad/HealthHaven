@@ -14,7 +14,8 @@ router
   .patch('/updateMe', authController.protectD, doctorController.updateMe);
 router
   .get('/getMe', authController.protectD, doctorController.getMe);
-
+router
+  .patch('/booking', authController.protectD, doctorController.BookingAgain);
 router
   .route('/:id')
   .get(authController.protectAD,doctorController.getDoctor)

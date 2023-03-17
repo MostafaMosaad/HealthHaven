@@ -83,7 +83,7 @@ exports.Booking = async (req, res) => {
       doctorPhone: doctor.phone,
       doctorAddress: doctor.address,
       doctorEmail: doctor.email,
-      date: formattedToday,
+      date: req.body.date,
       time: req.body.time,
     });
     await Users.findByIdAndUpdate(req.user.id, userr, {
@@ -95,7 +95,7 @@ exports.Booking = async (req, res) => {
       id: req.user.id,
       medical: [],
       time: req.body.time,
-      date: formattedToday,
+      date: req.body.date,
     };
     appointment.medical.push(userr.medicalHistory);
     doctor.appointments.push(appointment);

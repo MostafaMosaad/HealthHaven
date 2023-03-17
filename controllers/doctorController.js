@@ -1,4 +1,14 @@
 const Doctors = require("../models/doctorModel");
+const Users = require("../models/userModel");
+const today = new Date();
+const yyyy = today.getFullYear();
+let mm = today.getMonth() + 1; // Months start at 0!
+let dd = today.getDate();
+
+if (dd < 10) dd = "0" + dd;
+if (mm < 10) mm = "0" + mm;
+
+const formattedToday = dd + "/" + mm + "/" + yyyy;
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach(el => {
@@ -144,3 +154,60 @@ exports.getMe = (async (req, res, next) => {
     }
   });
 });
+
+
+exports.BookingAgain = async (req, res) => {
+  try {
+    // console.log(req.body.PatientID)
+    let userr = await Users.findById(req.body.PatientID);
+// console.log(userr)
+    const doctor = await Doctors.findById(req.doctor.id);
+    // console.log(doctor)
+
+    userr.bookings.push({
+      id: req.doctor.id,
+      doctorName: doctor.name,
+      doctorCategory: doctor.category,
+      doctorMajor: doctor.major,
+      doctorPhone: doctor.phone,
+      doctorAddress: doctor.address,
+      doctorEmail: doctor.email,
+      date: req.body.date,
+      time:req.body.time,
+      again:true,
+
+    });
+    await Users.findByIdAndUpdate(req.body.PatientID, userr, {
+      new: true,
+      runValidators: true,
+    });
+    const appointment = {
+      user: userr.name,
+      id: req.body.PatientID,
+      medical: [],
+      again:true,
+      time:req.body.time,
+      date: req.body.date,
+
+    };
+    appointment.medical.push(userr.medicalHistory);
+    doctor.appointments.push(appointment);
+    await Doctors.findByIdAndUpdate(req.doctor.id, doctor, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        userr,
+      },
+    });
+  } catch (err) {
+    // console.log(err)
+    res.status(400).json({
+      status: "Failed Booking Doctor !!!!",
+      message: err,
+    });
+  }
+};
